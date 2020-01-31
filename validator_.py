@@ -34,8 +34,10 @@ def is_valid_name(name):
         return False
     return True
 
+
 def fix_name(name):
     return ftfy.fix_text(name)
+
 
 def run_as_standalone_():
     test_mails = ["sup@gmail.com", "botnetbot@rambler.ru"]
@@ -62,6 +64,7 @@ def run_as_standalone_():
         print("ok")
     else:
         print("nop")
+
 
 if __name__ == '__main__':
     run_as_standalone_()

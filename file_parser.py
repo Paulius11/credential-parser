@@ -15,8 +15,8 @@ args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO)
 
-ABS_PATH: str = os.path.dirname(os.path.abspath(__file__))
-PARSED_FILE: str = os.path.join(ABS_PATH, "credential_data")
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
+PARSED_FILE = os.path.join(ABS_PATH, "credential_data")
 
 Data = namedtuple('Credentials', ['name', 'email', 'ip', 'password'])
 
@@ -38,13 +38,13 @@ def stats(parse_file_path):
     print('System Mode Time =', resource.getrusage(resource.RUSAGE_SELF).ru_stime)
 
 
-def sort(parse_file_path):
+def sort():
     """
     Sort file
     """
-    print("Sorting file")
-    sorted_suffix: str = '_sorted.tvs'
-    full_path_sorted: str = PARSED_FILE + sorted_suffix
+    print("Sorting file...")
+    sorted_suffix = '_sorted.tvs'
+    full_path_sorted = PARSED_FILE + sorted_suffix
     print(os.system(f"sort {PARSED_FILE}| uniq > {full_path_sorted}"))
     print(os.system(f" wc -l {full_path_sorted}"))
 
@@ -74,7 +74,7 @@ def parse_data(path_to_file, field_sep=":", print_ire=False, parse_field_len=Fal
 
                     user_data = Data(split_data[0], split_data[1], split_data[2], split_data[3])
                     if not validator_.is_valid_name(user_data.name):
-                        fixed_name: str = validator_.fix_name(user_data.name)
+                        fixed_name = validator_.fix_name(user_data.name)
                         logging.debug(f"{user_data.name} : {fixed_name}")
                         user_data = Data(fixed_name, split_data[1], split_data[2], split_data[3])
                         csv_writer.write_to_tsv([x for x in user_data])
@@ -148,7 +148,7 @@ def run_as_standalone():
         parse_field_len = args.n
         parse_data(parse_file_path, parse_field_len=parse_field_len)
         stats(parse_file_path)
-        sort(parse_file_path)
+        sort()
 
 
 if __name__ == "__main__":
