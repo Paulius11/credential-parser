@@ -5,11 +5,17 @@ import validator_
 from file_writer_ import CSWriter
 import logging
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('file', help="path to file")
+parser.add_argument('-n', type=int, required=False, metavar='value', default=4,
+                    help="parses given number of fields")
+args = parser.parse_args()
+
 logging.basicConfig(level=logging.INFO)
 
 ABS_PATH: str = os.path.dirname(os.path.abspath(__file__))
-RAW_FILE: str = '/home/sup/Documents/security/dumps/leaks/files/cracked_leaks/000webhost_13mil_plain_Oct_2015.txt'
-RAW_FILE: str = '/home/sup/Documents/security/dumps/leaks/files/cracked_leaks/000webhost_13mil_plain_Oct_2015.txt_min'
 PARSED_FILE: str = os.path.join(ABS_PATH, "credential_data")
 
 Data = namedtuple('Credentials', ['name', 'email', 'ip', 'password'])
@@ -17,22 +23,22 @@ Data = namedtuple('Credentials', ['name', 'email', 'ip', 'password'])
 csv_writer = CSWriter(filename=PARSED_FILE)
 
 
-def stats():
+def stats(parse_file_path):
     """
     Prints some interesting statistics
     """
-    print(f'File Size is {os.stat(RAW_FILE).st_size / (1024 * 1024)} MB')
-    print(f'Original file  {os.stat(RAW_FILE)}')
-    print(os.system(f'wc -l {RAW_FILE}'))
-    print(os.system(f'wc -l {PARSED_FILE}'))
+    print(f'File Size is {os.stat(parse_file_path).st_size / (1024 * 1024)} MB')
+    print(f'Original file  {os.stat(parse_file_path)}')
+    print(os.system(f'wc -l {parse_file_path}'))
+    print(os.system(f'wc -l {parse_file_path}'))
 
-    print(f'Parsed file  {os.stat(RAW_FILE)}')
+    print(f'Parsed file  {os.stat(parse_file_path)}')
     print('Peak Memory Usage =', resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     print('User Mode Time =', resource.getrusage(resource.RUSAGE_SELF).ru_utime)
     print('System Mode Time =', resource.getrusage(resource.RUSAGE_SELF).ru_stime)
 
 
-def sort():
+def sort(parse_file_path):
     """
     Sort file
     """
@@ -43,11 +49,11 @@ def sort():
     print(os.system(f" wc -l {full_path_sorted}"))
 
 
-def parse_data(path_to_file, field_sep=":", print_ire=False, print_field_len=False, print_all=False,
+def parse_data(path_to_file, field_sep=":", print_ire=False, parse_field_len=False, print_all=False,
                get_data_frequency=False):
     """
     Parses main data file
-    :param print_field_len: prints fields with defined field count
+    :param parse_field_len: prints fields with defined field count
     :param path_to_file: path to file to be parsed
     :param field_sep: char for identifying field
     :param print_all: prints all lines of file
@@ -63,8 +69,8 @@ def parse_data(path_to_file, field_sep=":", print_ire=False, print_field_len=Fal
             if line_number % 100000 == 0:
                 logging.info(f'Reading line:  {line_number}')
             split_data = [x.strip() for x in text_line.split(field_sep)]
-            if print_field_len:
-                if len(split_data) == print_field_len:
+            if parse_field_len:
+                if len(split_data) == parse_field_len:
 
                     user_data = Data(split_data[0], split_data[1], split_data[2], split_data[3])
                     if not validator_.is_valid_name(user_data.name):
@@ -137,9 +143,12 @@ def run_as_standalone():
     """
     Runs program as standalone script.
     """
-    parse_data(RAW_FILE, print_field_len=4)
-    stats()
-    sort()
+    if args:
+        parse_file_path = args.file
+        parse_field_len = args.n
+        parse_data(parse_file_path, parse_field_len=parse_field_len)
+        stats(parse_file_path)
+        sort(parse_file_path)
 
 
 if __name__ == "__main__":
